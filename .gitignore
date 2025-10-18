@@ -98,6 +98,7 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
-/.vscode/
+/.idea
+**/.vscode**
 /CandyRush/Library/PackageCache/com.unity.burst@1df634d836b8/.Runtime
 /CandyRush/Temp
