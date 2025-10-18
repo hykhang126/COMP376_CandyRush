@@ -442,9 +442,9 @@
 -analyzer:"C:/Unity/6000.0.59f2/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Unity/6000.0.59f2/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"C:/Unity/6000.0.59f2/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
-"Assets/InputManager.cs"
-"Assets/Map.cs"
 "Assets/Scripts/Cell.cs"
+"Assets/Scripts/InputManager.cs"
+"Assets/Scripts/Map.cs"
 "Assets/Scripts/Tile.cs"
 -langversion:9.0
 /deterministic
