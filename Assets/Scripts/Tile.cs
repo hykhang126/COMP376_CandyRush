@@ -13,7 +13,13 @@ public enum TileColor
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class Tile : MonoBehaviour, IPointerClickHandler
 {
+    [Header("Tile Settings")]
     public TileColor tileColor;
+    public Pair<int, int> gridPosition;
+
+    [Header("Movement Settings")]
+    public Vector3 targetPosition;
+    public float speed = 10f;
 
     private SpriteRenderer spriteRenderer;
 
@@ -27,6 +33,28 @@ public class Tile : MonoBehaviour, IPointerClickHandler
     void Update()
     {
         ChangeTileColor(this, tileColor);
+        MoveToPosition();
+    }
+
+    public void Initialize(TileColor color, Pair<int, int> position, Vector3 worldPosition)
+    {
+        tileColor = color;
+        gridPosition = position;
+        targetPosition = worldPosition;
+        transform.position = worldPosition;
+    }
+
+    public void SetTargetPosition(Vector3 newPosition)
+    {
+        targetPosition = newPosition;
+    }
+
+    private void MoveToPosition()
+    {
+        if (transform.position != targetPosition)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        }
     }
 
     public static void ChangeTileColor(Tile tile, TileColor color)
@@ -55,8 +83,20 @@ public class Tile : MonoBehaviour, IPointerClickHandler
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"{tileColor} clicked at {transform.position}.");
+        InputManager.Instance.UpdateClickedTiles(this);
     }
     
     #endregion
+}
+
+public class Pair<T1, T2>
+{
+    public T1 First { get; set; }
+    public T2 Second { get; set; }
+
+    public Pair(T1 first, T2 second)
+    {
+        First = first;
+        Second = second;
+    }
 }
