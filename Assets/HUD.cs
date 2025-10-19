@@ -16,9 +16,17 @@ public class HUD : MonoBehaviour
     public TextMeshProUGUI yellowMatchCountText;
     public TextMeshProUGUI purpleMatchCountText;
 
+    public GameObject pauseMenuPanel;
+    public GameObject gameOverPanel;
+    public GameObject gameWinPanel;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        GameManager.Instance.OnGamePause.AddListener(HandleGamePause);
+        GameManager.Instance.OnGameOver.AddListener(HandleGameOver);
+        GameManager.Instance.OnGameWin.AddListener(HandleGameWin);
+
         UpdateScoreText();
         UpdateMultiplierText();
         UpdateTimeSlider();
@@ -35,6 +43,8 @@ public class HUD : MonoBehaviour
         UpdateMovesLeftText();
         UpdateMatchCountTexts();
     }
+
+    #region UI Update Methods
 
     private void UpdateScoreText()
     {
@@ -64,4 +74,28 @@ public class HUD : MonoBehaviour
         yellowMatchCountText.text = $"{GameManager.Instance.yellowMatchCount}/{GameManager.YELLOW_MATCH_GOAL}";
         purpleMatchCountText.text = $"{GameManager.Instance.purpleMatchCount}/{GameManager.PURPLE_MATCH_GOAL}";
     }
+
+    #endregion
+
+    #region Events Handlers
+
+    public void HandleGamePause()
+    {
+        // Show Pause Menu UI
+        pauseMenuPanel.SetActive(true);
+    }
+
+    public void HandleGameOver()
+    {
+        // Show Game Over UI
+        gameOverPanel.SetActive(true);
+    }
+
+    public void HandleGameWin()
+    {
+        // Show Game Win UI
+        gameWinPanel.SetActive(true);
+    }
+
+    #endregion
 }

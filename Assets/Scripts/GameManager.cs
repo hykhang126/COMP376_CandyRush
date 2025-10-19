@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,6 +22,11 @@ public class GameManager : MonoBehaviour
     public const int PURPLE_MATCH_GOAL = 3;
     public int purpleMatchCount = 0;
 
+    [Header("Game Events")]
+    public UnityEvent OnGamePause;
+    public UnityEvent OnGameResume;
+    public UnityEvent OnGameOver;
+    public UnityEvent OnGameWin;
 
     // SINGLETON
     public static GameManager Instance { get; private set; }
@@ -42,8 +48,14 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        score = 0f;
-        multiplier = 1;
+        OnGameOver.AddListener(HandleGameOver);
+        OnGameWin.AddListener(HandleGameWin);
+
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) => {
+            ResetGameStats();
+        };
+
+        ResetGameStats();
     }
 
     // Update is called once per frame
@@ -57,6 +69,7 @@ public class GameManager : MonoBehaviour
         {
             timeLeft = 0f;
             // trigger game over
+            OnGameOver.Invoke();
         }
     }
 
@@ -72,7 +85,34 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        ResetGameStats();
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    public void ResetGameStats()
+    {
+        score = 0f;
+        multiplier = 1;
+        movesLeft = 15;
+        timeLeft = MAX_TIME;
+
+        blueMatchCount = 0;
+        redMatchCount = 0;
+        greenMatchCount = 0;
+        yellowMatchCount = 0;
+        purpleMatchCount = 0;
+
+        ResumeGame();
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1f;
     }
 
     public void AddScore(float points)
@@ -97,6 +137,7 @@ public class GameManager : MonoBehaviour
         {
             movesLeft = 0;
             // trigger game over
+            OnGameOver.Invoke();
         }
     }
 
@@ -123,6 +164,11 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("Invalid color for match count.");
                 break;
         }
+
+        if (CheckWinCondition())
+        {
+            OnGameWin.Invoke();
+        }
     }
 
     public bool CheckWinCondition()
@@ -136,12 +182,40 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    #region Events Handlers
+
+    public void HandleGameOver()
+    {
+        PauseGame();
+    }
+
+    public void HandleGameWin()
+    {
+        PauseGame();
+    }
+
+    [ContextMenu("Test Win Condition")]
+    public void TestWinCondition()
+    {
+        OnGameWin.Invoke();
+    }
+
+    [ContextMenu("Test Game Over")]
+    public void TestGameOver()
+    {
+        OnGameOver.Invoke();
+    }
+
+    #endregion
+
     #region Scene Management
 
     public void LoadScene(string sceneName)
     {
+        ResetGameStats();
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
     
     #endregion
+
 }

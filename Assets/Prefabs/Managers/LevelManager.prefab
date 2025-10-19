@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1283949341117413767}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: -3, z: 0}
+  m_LocalPosition: {x: -3.52, y: -3.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -98,7 +98,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8998711152453594732}
-  - component: {fileID: 8525113652305628226}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -124,22 +123,6 @@ Transform:
   - {fileID: 6914832172012636720}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8525113652305628226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5823438158540686250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4bce7b587cc2c14da5f8694cebed229, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  score: 0
-  multiplier: 1
-  movesLeft: 15
-  timeLeft: 90
 --- !u!1 &7222490581327419307
 GameObject:
   m_ObjectHideFlags: 0

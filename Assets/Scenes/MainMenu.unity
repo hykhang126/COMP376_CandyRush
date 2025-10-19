@@ -211,7 +211,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -347,7 +347,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -531,6 +531,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 802434171}
   m_CullTransparentMesh: 1
+--- !u!1001 &1311064893
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4223492698959426622, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_Name
+      value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 268.693
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 41.2247
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.1656139
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705192095853789870, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
 --- !u!1 &1485697601
 GameObject:
   m_ObjectHideFlags: 0
@@ -805,7 +862,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -863,7 +920,6 @@ GameObject:
   - component: {fileID: 1758504419}
   - component: {fileID: 1758504418}
   - component: {fileID: 1758504417}
-  - component: {fileID: 1758504421}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -989,18 +1045,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1758504421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1758504416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4bce7b587cc2c14da5f8694cebed229, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1912103163
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,8 +1081,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -165}
-  m_SizeDelta: {x: 550.677, y: 80.154}
+  m_AnchoredPosition: {x: 0, y: -148.58298}
+  m_SizeDelta: {x: 582.258, y: 129.74}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1912103165
 MonoBehaviour:
@@ -1084,7 +1128,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1758504421}
+      - m_Target: {fileID: 6646798007076666223, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: LoadScene
         m_Mode: 5
@@ -1170,8 +1214,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -329}
-  m_SizeDelta: {x: 550.677, y: 80.154}
+  m_AnchoredPosition: {x: 0, y: -327.58298}
+  m_SizeDelta: {x: 582.258, y: 129.74}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2007552578
 MonoBehaviour:
@@ -1217,7 +1261,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1758504421}
+      - m_Target: {fileID: 6646798007076666223, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: QuitGame
         m_Mode: 1
@@ -1303,8 +1347,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 12}
-  m_SizeDelta: {x: 550.677, y: 80.154}
+  m_AnchoredPosition: {x: 0, y: 35}
+  m_SizeDelta: {x: 582.258, y: 129.74}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2076125203
 MonoBehaviour:
@@ -1350,7 +1394,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1758504421}
+      - m_Target: {fileID: 6646798007076666223, guid: 6d02e741453ecc14d96c0b10c668f6ba, type: 3}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: LoadScene
         m_Mode: 5
@@ -1407,3 +1451,4 @@ SceneRoots:
   - {fileID: 1758504420}
   - {fileID: 1487184152}
   - {fileID: 1485697604}
+  - {fileID: 1311064893}
