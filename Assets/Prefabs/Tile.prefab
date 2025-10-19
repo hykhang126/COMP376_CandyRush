@@ -149,6 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileColor: 0
+  targetPosition: {x: 0, y: 0, z: 0}
+  speed: 10
 --- !u!114 &1684343489081384306
 MonoBehaviour:
   m_ObjectHideFlags: 0

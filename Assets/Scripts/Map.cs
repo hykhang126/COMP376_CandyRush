@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -21,8 +23,13 @@ public class Map : MonoBehaviour
     [SerializeField] GameObject cellContainer;
     [SerializeField] private GameObject tilePrefab;
 
+    [Header("Spawning chances")]
+    [SerializeField] private float sameColorSpawnChance = 0.4f;
+    [SerializeField] private float differentColorSpawnChance = 0.6f;
+
     public Tile[,] Grid { get; private set; }
-    public bool[,] Matched { get; private set; }
+    public List<Tile> verticalMatches;
+    public List<Tile> horizontalMatches;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -30,40 +37,10 @@ public class Map : MonoBehaviour
         InputManager.Instance.OnTileSwapped.AddListener(HandleTileSwapped);
         OnResolveMatches.AddListener(HandleResolveMatches);
 
-        RebuildMap();
+        GenerateNewMap();
     }
 
     #region Public Methods
-
-    public void GenerateNewMap()
-    {
-        ClearMap();
-        BuildMap();
-    }
-
-    public IEnumerator ResolveMatchesCoroutine(float delay = 0.5f)
-    {
-        CheckMatches();
-        do
-        {
-            RemoveMatchedTiles();
-
-            // Different refill schemes based on scene name
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level1")
-            {
-                RefillMap1();
-            }
-            else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level2")
-            {
-                RefillMap2();
-            }
-
-            CheckMatches();
-
-            yield return new WaitForSeconds(delay);
-        }
-        while (HasMatches());
-    }
 
     public static Vector3 GridPosToWorldPos(int row, int column, Transform mapOrigin, float cellSpacing)
     {
@@ -76,6 +53,13 @@ public class Map : MonoBehaviour
         return worldPosition;
     }
 
+    public void AddScore()
+    {
+        // Add score for matches
+        GameManager.Instance.AddScore(verticalMatches.Count + horizontalMatches.Count);
+        GameManager.Instance.IncreaseMultiplier();
+    }
+
     #endregion
 
     #region Private Methods
@@ -85,6 +69,8 @@ public class Map : MonoBehaviour
     /// </summary>
     private void BuildMap()
     {
+        ClearMap();
+
         Grid = new Tile[rows, columns];
 
         for (int row = 0; row < rows; row++)
@@ -115,8 +101,34 @@ public class Map : MonoBehaviour
     private void CheckMatches()
     {
         // check a nxn grid to see if there are any matches vertically or horizontally, matches occur when 3 or more tiles of the same color are adjacent
-        // build a 2D array of Tile references from the instantiated cells
-        Matched = new bool[rows, columns];
+
+        // Reset
+        ClearMatches();
+
+        // check vertical matches
+        for (int col = 0; col < columns; col++)
+        {
+            int runStart = 0;
+            for (int row = 1; row <= rows; row++)
+            {
+                Tile prev = Grid[row - 1, col];
+                Tile cur = (row < rows) ? Grid[row, col] : null;
+                bool continueRun = prev != null && cur != null && prev.tileColor == cur.tileColor;
+
+                if (!continueRun)
+                {
+                    int runLength = row - runStart;
+                    if (runLength >= 3)
+                    {
+                        for (int r = runStart; r < row; r++)
+                        {
+                            verticalMatches.Add(Grid[r, col]);
+                        }
+                    }
+                    runStart = row;
+                }
+            }
+        }
 
         // check horizontal matches
         for (int row = 0; row < rows; row++)
@@ -134,32 +146,11 @@ public class Map : MonoBehaviour
                     if (runLength >= 3)
                     {
                         for (int c = runStart; c < col; c++)
-                            Matched[row, c] = true;
+                        {
+                            horizontalMatches.Add(Grid[row, c]);
+                        }
                     }
                     runStart = col;
-                }
-            }
-        }
-
-        // check vertical matches
-        for (int col = 0; col < columns; col++)
-        {
-            int runStart = 0;
-            for (int row = 1; row <= rows; row++)
-            {
-                Tile prev = Grid[row - 1, col];
-                Tile cur = (row < rows) ? Grid[row, col] : null;
-                bool continueRun = (prev != null && cur != null && prev.tileColor == cur.tileColor);
-
-                if (!continueRun)
-                {
-                    int runLength = row - runStart;
-                    if (runLength >= 3)
-                    {
-                        for (int r = runStart; r < row; r++)
-                            Matched[r, col] = true;
-                    }
-                    runStart = row;
                 }
             }
         }
@@ -171,13 +162,9 @@ public class Map : MonoBehaviour
     /// <returns>True if there are matches, false otherwise.</returns>
     private bool HasMatches()
     {
-        for (int row = 0; row < rows; row++)
+        if (verticalMatches.Count > 0 || horizontalMatches.Count > 0)
         {
-            for (int col = 0; col < columns; col++)
-            {
-                if (Matched[row, col])
-                    return true;
-            }
+            return true;
         }
         return false;
     }
@@ -187,17 +174,23 @@ public class Map : MonoBehaviour
     /// </summary>
     private void RemoveMatchedTiles()
     {
-        for (int row = 0; row < rows; row++)
+        // Remove based on the vertical and horizontal matches lists
+        foreach (Tile tile in verticalMatches)
         {
-            for (int col = 0; col < columns; col++)
+            if (Grid[tile.gridPosition.First, tile.gridPosition.Second])
             {
-                if (Matched[row, col])
-                {
-                    Destroy(Grid[row, col].gameObject);
-                    Grid[row, col] = null;
-                    Matched[row, col] = false;
-                }
+                Grid[tile.gridPosition.First, tile.gridPosition.Second] = null;
             }
+            Destroy(tile.gameObject);
+        }
+
+        foreach (Tile tile in horizontalMatches)
+        {
+            if (Grid[tile.gridPosition.First, tile.gridPosition.Second])
+            {
+                Grid[tile.gridPosition.First, tile.gridPosition.Second] = null;
+            }
+            Destroy(tile.gameObject);
         }
     }
 
@@ -262,12 +255,283 @@ public class Map : MonoBehaviour
     }
 
     /// <summary>
-    /// Refille scheme 1:
+    /// Refill scheme 1:
     /// </summary>
     private void RefillMap1()
     {
-        MoveTilesDown();
+        verticalMatches.Sort((a, b) => a.gridPosition.First.CompareTo(b.gridPosition.First));
+        horizontalMatches.Sort((a, b) => a.gridPosition.First.CompareTo(b.gridPosition.First));
 
+        // After moving existing tiles down, fill in new tiles at the top
+        foreach (Tile verticalTile in verticalMatches)
+        {
+            int row = verticalTile.gridPosition.First;
+            int col = verticalTile.gridPosition.Second;
+
+            // If spawned then ignore
+            if (Grid[row, col] != null) continue;
+
+            Vector3 spawnPos = GridPosToWorldPos(row + rows, col, mapOrigin, cellSpacing);
+            Vector3 targetPos = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
+
+            GameObject tileObject = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
+            tileObject.name = $"Tile ({row}, {col})";
+
+            Tile tile = tileObject.GetComponent<Tile>();
+            TileColor tileColor;
+
+            // The first element in the vertical match is the bottom left tile
+            if (row == 0)
+            {
+                tileColor = (TileColor)Random.Range(0, System.Enum.GetValues(typeof(TileColor)).Length);
+            }
+            else
+            {
+                // check if this tile has another matching tile below it in the verticalMatches list
+                Pair<int, int> belowPos = new(row - 1, col);
+                if (verticalMatches.Exists(t => t.gridPosition.Equals(belowPos)))
+                {
+                    // if there is a matching tile below, then this tile has 60% chance to be the same color
+                    TileColor belowTileColor = Grid[row - 1, col].tileColor;
+                    if (Random.Range(0f, 1f) < sameColorSpawnChance)
+                    {
+                        tileColor = belowTileColor;
+                    }
+                    else
+                    {
+                        List<TileColor> otherColors = new();
+                        foreach (TileColor color in System.Enum.GetValues(typeof(TileColor)))
+                        {
+                            if (color != belowTileColor)
+                            {
+                                otherColors.Add(color);
+                            }
+                        }
+                        tileColor = otherColors[Random.Range(0, otherColors.Count)];
+                    }
+                }
+                else
+                {
+                    TileColor belowTileColor = Grid[row - 1, col].tileColor;
+                    // if no tile below, get color from the tile below in the grid with 40% chance, else random from the rest
+                    if (Random.Range(0f, 1f) < differentColorSpawnChance)
+                    {
+                        tileColor = belowTileColor;
+                    }
+                    else
+                    {
+                        List<TileColor> otherColors = new();
+                        foreach (TileColor color in System.Enum.GetValues(typeof(TileColor)))
+                        {
+                            if (color != belowTileColor)
+                            {
+                                otherColors.Add(color);
+                            }
+                        }
+                        tileColor = otherColors[Random.Range(0, otherColors.Count)];
+                    }
+                }
+            }
+
+            tile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
+            Grid[row, col] = tile;
+
+        }
+
+        foreach (Tile horizontalTile in horizontalMatches)
+        {
+            int row = horizontalTile.gridPosition.First;
+            int col = horizontalTile.gridPosition.Second;
+
+            // If spawned then ignore
+            if (Grid[row, col] != null) continue;
+
+            Vector3 spawnPos = GridPosToWorldPos(row + rows, col, mapOrigin, cellSpacing);
+            Vector3 targetPos = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
+
+            GameObject tileObject = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
+            tileObject.name = $"Tile ({row}, {col})";
+
+            Tile tile = tileObject.GetComponent<Tile>();
+            TileColor tileColor;
+
+            // if the last row the tile color is random
+            if (row == 0)
+            {
+                tileColor = (TileColor)Random.Range(0, System.Enum.GetValues(typeof(TileColor)).Length);
+            }
+            else
+            {
+                // 60% chance to match the tile below it
+                TileColor belowTileColor = Grid[row - 1, col].tileColor;
+                if (Random.Range(0f, 1f) < differentColorSpawnChance)
+                {
+                    tileColor = belowTileColor;
+                }
+                else
+                {
+                    List<TileColor> otherColors = new();
+                    foreach (TileColor color in System.Enum.GetValues(typeof(TileColor)))
+                    {
+                        if (color != belowTileColor)
+                        {
+                            otherColors.Add(color);
+                        }
+                    }
+                    tileColor = otherColors[Random.Range(0, otherColors.Count)];
+                }
+            }
+
+            tile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
+            Grid[row, col] = tile;
+        }
+        
+    }
+
+    /// <summary>
+    /// Refill scheme 2:
+    /// </summary>
+    private void RefillMap2()
+    {
+        verticalMatches.Sort((a, b) => a.gridPosition.First.CompareTo(b.gridPosition.First));
+        horizontalMatches.Sort((a, b) => a.gridPosition.First.CompareTo(b.gridPosition.First));
+
+        foreach (Tile tile in verticalMatches)
+        {
+            int row = tile.gridPosition.First;
+            int col = tile.gridPosition.Second;
+
+            // If spawned then ignore
+            if (Grid[row, col] != null) continue;
+
+            Vector3 spawnPos = GridPosToWorldPos(row + rows, col, mapOrigin, cellSpacing);
+            Vector3 targetPos = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
+
+            GameObject tileObject = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
+            tileObject.name = $"Tile ({row}, {col})";
+
+            Tile newTile = tileObject.GetComponent<Tile>();
+            TileColor tileColor = TileColor.Red;
+            // color is determine by all the neighboring tiles, more common color has higher chance
+            Dictionary<TileColor, int> neighborColorCount = new();
+            for (int r = -1; r <= 1; r++)
+            {
+                for (int c = -1; c <= 1; c++)
+                {
+                    if (r == 0 && c == 0) continue;
+                    int neighborRow = row + r;
+                    int neighborCol = col + c;
+                    if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < columns)
+                    {
+                        Tile neighborTile = Grid[neighborRow, neighborCol];
+                        if (neighborTile != null)
+                        {
+                            if (neighborColorCount.ContainsKey(neighborTile.tileColor))
+                            {
+                                neighborColorCount[neighborTile.tileColor]++;
+                            }
+                            else
+                            {
+                                neighborColorCount[neighborTile.tileColor] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Determine the new tile color based on neighbor colors
+            if (neighborColorCount.Count > 0)
+            {
+                int total = neighborColorCount.Values.Sum();
+                int randomValue = Random.Range(0, total);
+                foreach (var kvp in neighborColorCount)
+                {
+                    if (randomValue < kvp.Value)
+                    {
+                        tileColor = kvp.Key;
+                        break;
+                    }
+                    randomValue -= kvp.Value;
+                }
+            }
+
+            newTile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
+
+            Grid[row, col] = newTile;
+        }
+
+        foreach (Tile tile in horizontalMatches)
+        {
+            int row = tile.gridPosition.First;
+            int col = tile.gridPosition.Second;
+
+            // If spawned then ignore
+            if (Grid[row, col] != null) continue;
+
+            Vector3 spawnPos = GridPosToWorldPos(row + rows, col, mapOrigin, cellSpacing);
+            Vector3 targetPos = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
+
+            GameObject tileObject = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
+            tileObject.name = $"Tile ({row}, {col})";
+
+            Tile newTile = tileObject.GetComponent<Tile>();
+            TileColor tileColor = TileColor.Red;
+            // color is determine by all the neighboring tiles, more common color has higher chance
+            Dictionary<TileColor, int> neighborColorCount = new();
+            for (int r = -1; r <= 1; r++)
+            {
+                for (int c = -1; c <= 1; c++)
+                {
+                    if (r == 0 && c == 0) continue;
+                    int neighborRow = row + r;
+                    int neighborCol = col + c;
+                    if (neighborRow >= 0 && neighborRow < rows && neighborCol >= 0 && neighborCol < columns)
+                    {
+                        Tile neighborTile = Grid[neighborRow, neighborCol];
+                        if (neighborTile != null)
+                        {
+                            if (neighborColorCount.ContainsKey(neighborTile.tileColor))
+                            {
+                                neighborColorCount[neighborTile.tileColor]++;
+                            }
+                            else
+                            {
+                                neighborColorCount[neighborTile.tileColor] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Determine the new tile color based on neighbor colors
+            if (neighborColorCount.Count > 0)
+            {
+                int total = neighborColorCount.Values.Sum();
+                int randomValue = Random.Range(0, total);
+                foreach (var kvp in neighborColorCount)
+                {
+                    if (randomValue < kvp.Value)
+                    {
+                        tileColor = kvp.Key;
+                        break;
+                    }
+                    randomValue -= kvp.Value;
+                }
+            }
+
+            newTile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
+
+            Grid[row, col] = newTile;
+        }
+    }
+
+    /// <summary>
+    /// Refill scheme 3:
+    /// </summary>
+    private void RefillMap3()
+    {
+        MoveTilesDown();
+        
         // After moving existing tiles down, fill in new tiles at the top
         for (int row = 0; row < rows; row++)
         {
@@ -275,30 +539,26 @@ public class Map : MonoBehaviour
             {
                 if (Grid[row, col] == null)
                 {
-                    int rowOffset = rows * 1; // Spawn new tiles well above the map
-                    Vector3 tilePosition = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
-                    Vector3 spawnPosition = GridPosToWorldPos(row + rowOffset, col, mapOrigin, cellSpacing);
+                    Vector3 spawnPos = GridPosToWorldPos(row + rows, col, mapOrigin, cellSpacing);
+                    Vector3 targetPos = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
 
-                    GameObject tileObject = Instantiate(tilePrefab, spawnPosition, Quaternion.identity, transform);
-                    Tile tile = tileObject.GetComponent<Tile>();
-
+                    GameObject tileObject = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
                     tileObject.name = $"Tile ({row}, {col})";
+
+                    Tile tile = tileObject.GetComponent<Tile>();
                     TileColor tileColor = (TileColor)Random.Range(0, System.Enum.GetValues(typeof(TileColor)).Length);
-                    tile.Initialize(tileColor, new Pair<int, int>(row, col), tilePosition);
+                    tile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
 
                     Grid[row, col] = tile;
                 }
             }
         }
-        
     }
 
-    /// <summary>
-    /// Refille scheme 2:
-    /// </summary>
-    private void RefillMap2()
+    private void ClearMatches()
     {
-        MoveTilesDown();
+        verticalMatches.Clear();
+        horizontalMatches.Clear();
     }
 
     #region Event Handlers
@@ -329,6 +589,10 @@ public class Map : MonoBehaviour
         Grid[firstTileGridPos.First, firstTileGridPos.Second] = secondTile;
         Grid[secondTileGridPos.First, secondTileGridPos.Second] = firstTile;
 
+        // Update the name of the tiles for easier debugging
+        firstTile.gameObject.name = $"Tile ({secondTileGridPos.First}, {secondTileGridPos.Second})";
+        secondTile.gameObject.name = $"Tile ({firstTileGridPos.First}, {firstTileGridPos.Second})";
+
         // Animation delay
         yield return new WaitForSeconds(delay);
 
@@ -346,6 +610,10 @@ public class Map : MonoBehaviour
             // Update the map grid
             Grid[firstTileGridPos.First, firstTileGridPos.Second] = firstTile;
             Grid[secondTileGridPos.First, secondTileGridPos.Second] = secondTile;
+
+            // Update the name of the tiles for easier debugging
+            firstTile.gameObject.name = $"Tile ({firstTileGridPos.First}, {firstTileGridPos.Second})";
+            secondTile.gameObject.name = $"Tile ({secondTileGridPos.First}, {secondTileGridPos.Second})";
         }
         else
         {
@@ -360,6 +628,50 @@ public class Map : MonoBehaviour
         StartCoroutine(ResolveMatchesCoroutine(delay));
     }
     
+    /// <summary>
+    /// Coroutine to resolve matches with delay
+    /// </summary>
+    /// <param name="delay">Delay between each refill</param>
+    /// <returns></returns>
+    private IEnumerator ResolveMatchesCoroutine(float delay = 1.0f)
+    {
+        CheckMatches();
+
+        // if there are no matches, exit
+        if (!HasMatches())
+        {
+            GenerateNewMap();
+            yield break;
+        }
+        else
+            do
+            {
+                RemoveMatchedTiles();
+
+                // check if current scene is level 1 or level 2
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level1")
+                {
+                    RefillMap1();
+                }
+                else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level2")
+                {
+                    RefillMap2();
+                }
+                else
+                {
+                    RefillMap3();
+                }
+
+                AddScore();
+                CheckMatches();
+
+                yield return new WaitForSeconds(delay);
+            }
+            while (HasMatches());
+        
+        GameManager.Instance.ResetMultiplier();
+    }
+
     #endregion
 
     #endregion
@@ -375,17 +687,16 @@ public class Map : MonoBehaviour
     }
 
     [ContextMenu("Rebuild Map")]
-    private void RebuildMap()
+    private void GenerateNewMap()
     {
-        GenerateNewMap();
+        BuildMap();
         CheckMatches();
-        do
+        while (HasMatches())
         {
             RemoveMatchedTiles();
             RefillMapStart();
             CheckMatches();
         }
-        while (HasMatches());
     }
     
     #endregion

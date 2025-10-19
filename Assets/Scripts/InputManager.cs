@@ -44,6 +44,14 @@ public class InputManager : MonoBehaviour
 
     public void UpdateClickedTiles(Tile clickedTile)
     {
+        // Deselect tile if clicked again
+        if (clickedTile == firstClickedTile)
+        {
+            clickedTile.transform.localScale = Vector3.one * 0.9f;
+            firstClickedTile = null;
+            return;
+        }
+
         if (firstClickedTile == null)
         {
             firstClickedTile = clickedTile;
@@ -63,6 +71,10 @@ public class InputManager : MonoBehaviour
 
     private void CheckCanSwapTiles()
     {
+        // Reset scale of all tiles to indicate deselection
+        firstClickedTile.transform.localScale = Vector3.one * 0.9f;
+        secondClickedTile.transform.localScale = Vector3.one * 0.9f;
+
         // Check if the two tiles are adjacent
         int rowDiff = Mathf.Abs(firstClickedTile.gridPosition.First - secondClickedTile.gridPosition.First);
         int colDiff = Mathf.Abs(firstClickedTile.gridPosition.Second - secondClickedTile.gridPosition.Second);

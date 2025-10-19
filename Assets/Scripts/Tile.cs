@@ -82,6 +82,9 @@ public class Tile : MonoBehaviour, IPointerClickHandler
     
     public void OnPointerClick(PointerEventData eventData)
     {
+        // Make the sprite slightly smaller to indicate selection
+        transform.localScale = Vector3.one * 0.5f;
+        // Notify InputManager of the clicked tile
         InputManager.Instance.UpdateClickedTiles(this);
     }
     
@@ -97,5 +100,20 @@ public class Pair<T1, T2>
     {
         First = first;
         Second = second;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Pair<T1, T2> other)
+        {
+            return First.Equals(other.First) &&
+                   Second.Equals(other.Second);
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return First.GetHashCode() ^ Second.GetHashCode();
     }
 }
