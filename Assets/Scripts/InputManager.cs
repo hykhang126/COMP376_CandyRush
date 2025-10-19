@@ -69,7 +69,6 @@ public class InputManager : MonoBehaviour
 
         if ((rowDiff == 1 && colDiff == 0) || (rowDiff == 0 && colDiff == 1))
         {
-            Debug.Log("Tiles are adjacent. Swapping...");
             OnTileSwapped?.Invoke(firstClickedTile, secondClickedTile);
         }
         else

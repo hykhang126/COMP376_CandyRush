@@ -41,7 +41,7 @@ public class Map : MonoBehaviour
         BuildMap();
     }
 
-    public void ResolveMatches()
+    public IEnumerator ResolveMatchesCoroutine(float delay = 0.5f)
     {
         CheckMatches();
         do
@@ -59,6 +59,8 @@ public class Map : MonoBehaviour
             }
 
             CheckMatches();
+
+            yield return new WaitForSeconds(delay);
         }
         while (HasMatches());
     }
@@ -201,7 +203,7 @@ public class Map : MonoBehaviour
 
     /// <summary>
     /// Refill the map by instantiating new tiles in empty grid positions at the start.
-    /// cheat by generating new tiles in empty grid positions instead of moving down existing tiles.
+    /// Cheat by generating new tiles in empty grid positions instead of moving down existing tiles.
     /// </summary>
     private void RefillMapStart()
     {
@@ -273,9 +275,11 @@ public class Map : MonoBehaviour
             {
                 if (Grid[row, col] == null)
                 {
+                    int rowOffset = rows * 1; // Spawn new tiles well above the map
                     Vector3 tilePosition = GridPosToWorldPos(row, col, mapOrigin, cellSpacing);
+                    Vector3 spawnPosition = GridPosToWorldPos(row + rowOffset, col, mapOrigin, cellSpacing);
 
-                    GameObject tileObject = Instantiate(tilePrefab, tilePosition, Quaternion.identity, transform);
+                    GameObject tileObject = Instantiate(tilePrefab, spawnPosition, Quaternion.identity, transform);
                     Tile tile = tileObject.GetComponent<Tile>();
 
                     tileObject.name = $"Tile ({row}, {col})";
@@ -352,7 +356,8 @@ public class Map : MonoBehaviour
     // Handle the OnResolveMatches event
     private void HandleResolveMatches()
     {
-        ResolveMatches();
+        float delay = 1f;
+        StartCoroutine(ResolveMatchesCoroutine(delay));
     }
     
     #endregion

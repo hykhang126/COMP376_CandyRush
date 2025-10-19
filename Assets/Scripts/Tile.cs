@@ -41,7 +41,6 @@ public class Tile : MonoBehaviour, IPointerClickHandler
         tileColor = color;
         gridPosition = position;
         targetPosition = worldPosition;
-        transform.position = worldPosition;
     }
 
     public void SetTargetPosition(Vector3 newPosition)
