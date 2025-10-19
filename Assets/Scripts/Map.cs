@@ -172,25 +172,38 @@ public class Map : MonoBehaviour
     /// <summary>
     /// Remove matched tiles marked from the map.
     /// </summary>
-    private void RemoveMatchedTiles()
+    private void RemoveMatchedTiles(List<Tile> matchedTilesList, bool updateMatchCount = false)
     {
+        // Collect color that appear in matched lists, also number of times they appear
+        Dictionary<TileColor, int> matchedColorCounts = new();
+
         // Remove based on the vertical and horizontal matches lists
-        foreach (Tile tile in verticalMatches)
+        foreach (Tile tile in matchedTilesList)
         {
             if (Grid[tile.gridPosition.First, tile.gridPosition.Second])
             {
                 Grid[tile.gridPosition.First, tile.gridPosition.Second] = null;
             }
             Destroy(tile.gameObject);
+
+            // Count matches for GameManager
+            if (!updateMatchCount) continue;
+            if (matchedColorCounts.ContainsKey(tile.tileColor))
+            {
+                matchedColorCounts[tile.tileColor]++;
+            }
+            else
+            {
+                matchedColorCounts[tile.tileColor] = 1;
+            }
         }
 
-        foreach (Tile tile in horizontalMatches)
+        // Update match counts in GameManager
+        if (!updateMatchCount) return;
+        foreach (KeyValuePair<TileColor, int> entry in matchedColorCounts)
         {
-            if (Grid[tile.gridPosition.First, tile.gridPosition.Second])
-            {
-                Grid[tile.gridPosition.First, tile.gridPosition.Second] = null;
-            }
-            Destroy(tile.gameObject);
+            // Count is 1 per 3 tiles matched
+            GameManager.Instance.AddMatch(entry.Key, entry.Value / 3);
         }
     }
 
@@ -312,6 +325,14 @@ public class Map : MonoBehaviour
                 }
                 else
                 {
+                    if (Grid[row - 1, col] == null)
+                    {
+                        // if there is no tile below, the color is random
+                        tileColor = (TileColor)Random.Range(0, System.Enum.GetValues(typeof(TileColor)).Length);
+                        tile.Initialize(tileColor, new Pair<int, int>(row, col), targetPos);
+                        Grid[row, col] = tile;
+                        continue;
+                    }
                     TileColor belowTileColor = Grid[row - 1, col].tileColor;
                     // if no tile below, get color from the tile below in the grid with 40% chance, else random from the rest
                     if (Random.Range(0f, 1f) < differentColorSpawnChance)
@@ -355,7 +376,7 @@ public class Map : MonoBehaviour
             Tile tile = tileObject.GetComponent<Tile>();
             TileColor tileColor;
 
-            // if the last row the tile color is random
+            // if tile is on the last row the tile color is random
             if (row == 0)
             {
                 tileColor = (TileColor)Random.Range(0, System.Enum.GetValues(typeof(TileColor)).Length);
@@ -644,9 +665,11 @@ public class Map : MonoBehaviour
             yield break;
         }
         else
+        {
             do
             {
-                RemoveMatchedTiles();
+                RemoveMatchedTiles(verticalMatches, true);
+                RemoveMatchedTiles(horizontalMatches, true);
 
                 // check if current scene is level 1 or level 2
                 if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level1")
@@ -668,7 +691,10 @@ public class Map : MonoBehaviour
                 yield return new WaitForSeconds(delay);
             }
             while (HasMatches());
-        
+        }
+
+        // Game management updates
+        GameManager.Instance.UseMove();
         GameManager.Instance.ResetMultiplier();
     }
 
@@ -693,7 +719,8 @@ public class Map : MonoBehaviour
         CheckMatches();
         while (HasMatches())
         {
-            RemoveMatchedTiles();
+            RemoveMatchedTiles(verticalMatches);
+            RemoveMatchedTiles(horizontalMatches);
             RefillMapStart();
             CheckMatches();
         }
