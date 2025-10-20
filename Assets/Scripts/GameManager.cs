@@ -195,10 +195,6 @@ public class GameManager : MonoBehaviour
             ChangeGameState(GameState.Paused);
             PauseGame();
         }
-        else if (currentGameState == GameState.Paused)
-        {
-            OnGameResume.Invoke();
-        }
     }
 
     public void HandleGameResume()

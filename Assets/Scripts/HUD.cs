@@ -123,7 +123,7 @@ public class HUD : MonoBehaviour
     
     public void OnClickResumeButton()
     {
-        GameManager.Instance.HandleGamePause();
+        GameManager.Instance.OnGameResume.Invoke();
     }
 
     #endregion

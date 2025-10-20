@@ -21,7 +21,7 @@ public class InputManager : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
 
         playerInput.actions.Enable();
-        playerInput.actions["Pause"].started += _ => GameManager.Instance.OnGamePause?.Invoke();
+        playerInput.actions["Pause"].started += _ => OnPauseInput();
     }
 
     public void UpdateClickedTiles(Tile clickedTile)
@@ -73,6 +73,14 @@ public class InputManager : MonoBehaviour
         // Reset clicked tiles after checking
         firstClickedTile = null;
         secondClickedTile = null;
+    }
+
+    private void OnPauseInput()
+    {
+        if (GameManager.Instance.currentGameState == GameState.Playing)
+        {
+            GameManager.Instance.OnGamePause.Invoke();
+        }
     }
 
     #endregion
