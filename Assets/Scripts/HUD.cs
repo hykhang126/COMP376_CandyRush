@@ -35,6 +35,11 @@ public class HUD : MonoBehaviour
         UpdateTimeSlider();
         UpdateMovesLeftText();
         UpdateMatchCountTexts();
+
+        // Hide all panels at start
+        pauseMenuPanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+        gameWinPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -109,11 +114,16 @@ public class HUD : MonoBehaviour
         // Spawn Stars based on score
         int starsEarned = GameManager.Instance.score >= 10000 ? 3 :
                           GameManager.Instance.score >= 5000 ? 2 : 1;
-        
+
         for (int i = 0; i < starsEarned; i++)
         {
             starsPrefabs[i].SetActive(true);
         }
+    }
+    
+    public void OnClickResumeButton()
+    {
+        GameManager.Instance.HandleGamePause();
     }
 
     #endregion

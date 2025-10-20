@@ -16,6 +16,7 @@ public class Tile : MonoBehaviour, IPointerClickHandler
     [Header("Tile Settings")]
     public TileColor tileColor;
     public Pair<int, int> gridPosition;
+    public InputManager inputManager;
 
     [Header("Movement Settings")]
     public Vector3 targetPosition;
@@ -27,6 +28,7 @@ public class Tile : MonoBehaviour, IPointerClickHandler
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        inputManager = FindFirstObjectByType<InputManager>();
     }
 
     // Update is called once per frame
@@ -85,7 +87,7 @@ public class Tile : MonoBehaviour, IPointerClickHandler
         // Make the sprite slightly smaller to indicate selection
         transform.localScale = Vector3.one * 0.5f;
         // Notify InputManager of the clicked tile
-        InputManager.Instance.UpdateClickedTiles(this);
+        inputManager.UpdateClickedTiles(this);
     }
     
     #endregion

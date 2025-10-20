@@ -3419,9 +3419,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6888687680059211217, guid: 09e881b49c1d21a41b18cb53ec3c7361, type: 3}
-        m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
-        m_MethodName: InvokePause
+      - m_Target: {fileID: 6630976335903483560}
+        m_TargetAssemblyTypeName: HUD, Assembly-CSharp
+        m_MethodName: OnClickResumeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

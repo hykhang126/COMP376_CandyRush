@@ -23,11 +23,12 @@ public class GameManager : MonoBehaviour
     public int purpleMatchCount = 0;
 
     [Header("Game Events")]
-    public GameState currentGameState = GameState.InMenu;
+    public GameState currentGameState = GameState.Playing;
     public UnityEvent OnGamePause;
     public UnityEvent OnGameResume;
     public UnityEvent OnGameOver;
     public UnityEvent OnGameWin;
+    public UnityEvent<Tile, Tile> OnTileSwapped;
 
     // SINGLETON
     public static GameManager Instance { get; private set; }
@@ -38,7 +39,6 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -188,15 +188,17 @@ public class GameManager : MonoBehaviour
 
     #region Events Handlers
 
-    public void InvokeResume()
-    {
-        OnGameResume.Invoke();
-    }
-
     public void HandleGamePause()
     {
-        ChangeGameState(GameState.Paused);
-        PauseGame();
+        if (currentGameState == GameState.Playing)
+        {
+            ChangeGameState(GameState.Paused);
+            PauseGame();
+        }
+        else if (currentGameState == GameState.Paused)
+        {
+            OnGameResume.Invoke();
+        }
     }
 
     public void HandleGameResume()

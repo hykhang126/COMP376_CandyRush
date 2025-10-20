@@ -53,6 +53,7 @@ MonoBehaviour:
   greenMatchCount: 0
   yellowMatchCount: 0
   purpleMatchCount: 0
+  currentGameState: 0
   OnGamePause:
     m_PersistentCalls:
       m_Calls: []
@@ -63,5 +64,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnGameWin:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTileSwapped:
     m_PersistentCalls:
       m_Calls: []

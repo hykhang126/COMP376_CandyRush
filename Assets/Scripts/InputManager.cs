@@ -1,37 +1,11 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Physics2DRaycaster), typeof(PlayerInput))]
+[RequireComponent(typeof(Physics2DRaycaster))]
+[RequireComponent(typeof(PlayerInput))]
 public class InputManager : MonoBehaviour
 {
-    #region Events
-
-    public UnityEvent<Tile, Tile> OnTileSwapped;
-
-    #endregion
-
-    #region Singleton
-
-    // SINGLETON
-    public static InputManager Instance { get; private set; }
-    // -----------------
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
-
-    #endregion
-
     #region Code
 
     public Tile firstClickedTile;
@@ -39,13 +13,15 @@ public class InputManager : MonoBehaviour
 
     private PlayerInput playerInput;
 
-    private void Start()
+    void Start()
     {
         firstClickedTile = null;
         secondClickedTile = null;
+
         playerInput = GetComponent<PlayerInput>();
 
-        playerInput.actions["Pause"].performed += ctx => InvokePause();
+        playerInput.actions.Enable();
+        playerInput.actions["Pause"].started += _ => GameManager.Instance.OnGamePause?.Invoke();
     }
 
     public void UpdateClickedTiles(Tile clickedTile)
@@ -87,7 +63,7 @@ public class InputManager : MonoBehaviour
 
         if ((rowDiff == 1 && colDiff == 0) || (rowDiff == 0 && colDiff == 1))
         {
-            OnTileSwapped?.Invoke(firstClickedTile, secondClickedTile);
+            GameManager.Instance.OnTileSwapped?.Invoke(firstClickedTile, secondClickedTile);
         }
         else
         {
@@ -97,18 +73,6 @@ public class InputManager : MonoBehaviour
         // Reset clicked tiles after checking
         firstClickedTile = null;
         secondClickedTile = null;
-    }
-
-    public void InvokePause()
-    {
-        if (GameManager.Instance.currentGameState == GameState.Playing)
-        {
-            GameManager.Instance.OnGamePause.Invoke();
-        }
-        else if (GameManager.Instance.currentGameState == GameState.Paused)
-        {
-            GameManager.Instance.OnGameResume.Invoke();
-        }
     }
 
     #endregion
