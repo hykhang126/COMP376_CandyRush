@@ -37,10 +37,15 @@ public class InputManager : MonoBehaviour
     public Tile firstClickedTile;
     public Tile secondClickedTile;
 
+    private PlayerInput playerInput;
+
     private void Start()
     {
         firstClickedTile = null;
         secondClickedTile = null;
+        playerInput = GetComponent<PlayerInput>();
+
+        playerInput.actions["Pause"].performed += ctx => InvokePause();
     }
 
     public void UpdateClickedTiles(Tile clickedTile)
@@ -92,6 +97,18 @@ public class InputManager : MonoBehaviour
         // Reset clicked tiles after checking
         firstClickedTile = null;
         secondClickedTile = null;
+    }
+
+    public void InvokePause()
+    {
+        if (GameManager.Instance.currentGameState == GameState.Playing)
+        {
+            GameManager.Instance.OnGamePause.Invoke();
+        }
+        else if (GameManager.Instance.currentGameState == GameState.Paused)
+        {
+            GameManager.Instance.OnGameResume.Invoke();
+        }
     }
 
     #endregion

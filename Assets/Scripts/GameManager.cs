@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public int purpleMatchCount = 0;
 
     [Header("Game Events")]
+    public GameState currentGameState = GameState.InMenu;
     public UnityEvent OnGamePause;
     public UnityEvent OnGameResume;
     public UnityEvent OnGameOver;
@@ -48,11 +49,15 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        OnGamePause.AddListener(HandleGamePause);
+        OnGameResume.AddListener(HandleGameResume);
         OnGameOver.AddListener(HandleGameOver);
         OnGameWin.AddListener(HandleGameWin);
 
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) => {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) =>
+        {
             ResetGameStats();
+            ChangeGameState(GameState.Playing);
         };
 
         ResetGameStats();
@@ -75,18 +80,17 @@ public class GameManager : MonoBehaviour
 
     #region  Game Management
 
+    public void ChangeGameState(GameState newState)
+    {
+        currentGameState = newState;
+    }
+
     public void QuitGame()
     {
         Application.Quit();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
-    }
-
-    public void RestartGame()
-    {
-        ResetGameStats();
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
     public void ResetGameStats()
@@ -105,12 +109,12 @@ public class GameManager : MonoBehaviour
         ResumeGame();
     }
 
-    public void PauseGame()
+    private void PauseGame()
     {
         Time.timeScale = 0f;
     }
 
-    public void ResumeGame()
+    private void ResumeGame()
     {
         Time.timeScale = 1f;
     }
@@ -184,13 +188,32 @@ public class GameManager : MonoBehaviour
 
     #region Events Handlers
 
+    public void InvokeResume()
+    {
+        OnGameResume.Invoke();
+    }
+
+    public void HandleGamePause()
+    {
+        ChangeGameState(GameState.Paused);
+        PauseGame();
+    }
+
+    public void HandleGameResume()
+    {
+        ChangeGameState(GameState.Playing);
+        ResumeGame();
+    }
+
     public void HandleGameOver()
     {
+        ChangeGameState(GameState.InMenu);
         PauseGame();
     }
 
     public void HandleGameWin()
     {
+        ChangeGameState(GameState.InMenu);
         PauseGame();
     }
 
@@ -210,12 +233,25 @@ public class GameManager : MonoBehaviour
 
     #region Scene Management
 
+    public void RestartGame()
+    {
+        ResetGameStats();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
     public void LoadScene(string sceneName)
     {
         ResetGameStats();
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
-    
+
     #endregion
 
+}
+
+public enum GameState
+{
+    Playing,
+    Paused,
+    InMenu
 }

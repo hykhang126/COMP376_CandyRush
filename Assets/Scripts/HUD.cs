@@ -26,6 +26,7 @@ public class HUD : MonoBehaviour
     void Start()
     {
         GameManager.Instance.OnGamePause.AddListener(HandleGamePause);
+        GameManager.Instance.OnGameResume.AddListener(HandleGameResume);
         GameManager.Instance.OnGameOver.AddListener(HandleGameOver);
         GameManager.Instance.OnGameWin.AddListener(HandleGameWin);
 
@@ -86,6 +87,12 @@ public class HUD : MonoBehaviour
     {
         // Show Pause Menu UI
         pauseMenuPanel.SetActive(true);
+    }
+
+    public void HandleGameResume()
+    {
+        // Hide Pause Menu UI
+        pauseMenuPanel.SetActive(false);
     }
 
     public void HandleGameOver()
