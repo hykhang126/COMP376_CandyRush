@@ -6,6 +6,7 @@ public class HUD : MonoBehaviour
 {
     [Header("UI Elements")]
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI winScoreText;
     public TextMeshProUGUI multiplierText;
     public Slider timeSlider;
     public TextMeshProUGUI movesLeftText;
@@ -19,6 +20,7 @@ public class HUD : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject gameOverPanel;
     public GameObject gameWinPanel;
+    public GameObject[] starsPrefabs;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -49,6 +51,7 @@ public class HUD : MonoBehaviour
     private void UpdateScoreText()
     {
         scoreText.text = $"{GameManager.Instance.score}";
+        winScoreText.text = $"{GameManager.Instance.score}";
     }
 
     private void UpdateMultiplierText()
@@ -95,6 +98,15 @@ public class HUD : MonoBehaviour
     {
         // Show Game Win UI
         gameWinPanel.SetActive(true);
+
+        // Spawn Stars based on score
+        int starsEarned = GameManager.Instance.score >= 10000 ? 3 :
+                          GameManager.Instance.score >= 5000 ? 2 : 1;
+        
+        for (int i = 0; i < starsEarned; i++)
+        {
+            starsPrefabs[i].SetActive(true);
+        }
     }
 
     #endregion

@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Physics2DRaycaster))]
+[RequireComponent(typeof(Physics2DRaycaster), typeof(PlayerInput))]
 public class InputManager : MonoBehaviour
 {
     #region Events
