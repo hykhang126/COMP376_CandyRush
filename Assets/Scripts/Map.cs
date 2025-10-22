@@ -31,9 +31,13 @@ public class Map : MonoBehaviour
     public List<Tile> verticalMatches;
     public List<Tile> horizontalMatches;
 
+    private SoundManager soundManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        soundManager = FindFirstObjectByType<SoundManager>();
+
         GameManager.Instance.OnTileSwapped.AddListener(HandleTileSwapped);
         OnResolveMatches.AddListener(HandleResolveMatches);
 
@@ -205,6 +209,9 @@ public class Map : MonoBehaviour
             // Count is 1 per 3 tiles matched
             GameManager.Instance.AddMatch(entry.Key, entry.Value / 3);
         }
+        
+        // Play sound effect
+        soundManager.PlaySoundEffect(0, 0.3f);
     }
 
     /// <summary>

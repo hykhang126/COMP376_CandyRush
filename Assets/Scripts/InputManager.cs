@@ -13,10 +13,14 @@ public class InputManager : MonoBehaviour
 
     private PlayerInput playerInput;
 
+    private SoundManager soundManager;
+
     void Start()
     {
         firstClickedTile = null;
         secondClickedTile = null;
+
+        soundManager = FindFirstObjectByType<SoundManager>();
 
         playerInput = GetComponent<PlayerInput>();
 
@@ -26,6 +30,8 @@ public class InputManager : MonoBehaviour
 
     public void UpdateClickedTiles(Tile clickedTile)
     {
+        soundManager.PlaySoundEffect(1, 0.4f);
+        
         // Deselect tile if clicked again
         if (clickedTile == firstClickedTile)
         {

@@ -120,10 +120,18 @@ public class HUD : MonoBehaviour
             starsPrefabs[i].SetActive(true);
         }
     }
-    
+
     public void OnClickResumeButton()
     {
         GameManager.Instance.OnGameResume.Invoke();
+    }
+    
+    public void OnClickPauseButton()
+    {
+        if (GameManager.Instance.currentGameState == GameState.Playing)
+        {
+            GameManager.Instance.OnGamePause.Invoke();
+        }
     }
 
     #endregion
