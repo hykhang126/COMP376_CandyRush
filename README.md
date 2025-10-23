@@ -7,7 +7,7 @@ Main menu, scoreboard, goal UI, pause button, pause & lose & win menus.
 ## Level, tile, and candy design
 2 levels according to the assignment.
 
-1 extra levels with random chances and blocks dropping down to fill the gap.
+1 extra level with random chances and blocks dropping down to fill the gap.
 
 ## Tile-matching mechanics
 Vertical and horizontal.
@@ -27,8 +27,8 @@ Spinning stars awared based on Win points.
 In the form of sounds, BGM, fonts and custom sprites.
 
 ## EXTRA FEATURES SUMMARY:
-1 extra levels with random chances and blocks dropping down to fill the gap.
+1 extra level with random chances and blocks dropping down to fill the gap.
 
-Spinning stars awared based on Win points.
+Spinning stars awarded based on Win points.
 
 Sound effects, BGM, fonts and custom sprites.
